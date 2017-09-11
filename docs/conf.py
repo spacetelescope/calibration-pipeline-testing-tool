@@ -180,3 +180,4 @@ if eval(setup_cfg.get('edit_on_github')):
 # -- Resolving issue number to links in changelog -----------------------------
 github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
 
+todo_include_todos = True

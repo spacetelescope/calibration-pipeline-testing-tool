@@ -1,17 +1,16 @@
-Documentation
-=============
+JWST Calibration Pipeline Testing
++++++++++++++++++++++++++++++++++
 
 This is the documentation for calibration-pipeline-testing-tool.
 
+CALDETECTOR1
+============
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 1
 
-  calibration-pipeline-testing-tool/index.rst
-
-.. note:: The layout of this directory is simply a suggestion.  To follow
-          traditional practice, do *not* edit this page, but instead place
-          all documentation for the affiliated package inside ``calibration-pipeline-testing-tool/``.
-          The traditional practice was intended to allow the affiliated
-          package to eventually be merged into the main astropy package.
-          You can follow this practice or choose your own layout.
+  caldetector1/dq_init.rst
+  caldetector1/saturation.rst
+  caldetector1/linearity.rst
+  caldetector1/dark_current.rst
+  caldetector1/superbias.rst

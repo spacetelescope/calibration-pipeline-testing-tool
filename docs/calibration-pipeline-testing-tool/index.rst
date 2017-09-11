@@ -1,5 +1,5 @@
 ***********************************************
-calibration-pipeline-testing-tool Documentation
+Calibration Pipeline Testing Tool Documentation
 ***********************************************
 
 This is the documentation for calibration-pipeline-testing-tool.
