@@ -1,0 +1,12 @@
+name: calibration-pipeline-testing-tool
+
+channels:
+    - astropy
+
+dependencies:
+    - astropy
+    - Cython
+    - matplotlib
+    - numpy
+#   - pip:
+#       - dependency_from_pip
