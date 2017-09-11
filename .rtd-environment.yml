@@ -2,11 +2,13 @@ name: calibration-pipeline-testing-tool
 
 channels:
     - astropy
+    - http://ssb.stsci.edu/astroconda
 
 dependencies:
     - astropy
     - Cython
     - matplotlib
     - numpy
+    - stsci_sphinx_theme
 #   - pip:
-#       - dependency_from_pip
+#       - stsci
