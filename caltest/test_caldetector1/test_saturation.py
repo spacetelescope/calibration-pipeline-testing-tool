@@ -5,8 +5,9 @@ from jwst.saturation import SaturationStep
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    yield fits.open(fits_input[0].header['filename'].replace('dqinitstep', 'saturationstep'))
-    os.remove(fits_input[0].header['filename'].replace('dqinitstep', 'saturationstep'))
+    fname = '_saturationstep.'.join(fits_input[0].header['filename'].split('.'))
+    yield fits.open(fname)
+    os.remove(fname)
 
 @pytest.fixture(scope='module')
 def fits_saturation(fits_output):
@@ -14,7 +15,7 @@ def fits_saturation(fits_output):
     ref_path = ref_path.replace('crds://', '/grp/crds/cache/references/jwst/')
     return fits.open(ref_path)
 
-def test_dq_init_step(fits_input):
+def test_saturation_step(fits_input):
     """Make sure the DQInitStep runs without error."""
     SaturationStep.call(fits_input, save_results=True)
 
