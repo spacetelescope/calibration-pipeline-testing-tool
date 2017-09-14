@@ -10,5 +10,5 @@ def run_test():
     pytest_args = ['-v']
     pytest_args += [os.path.dirname(__file__)]
     pytest_args += ['--config', args.config]
-    pytest_args += ['--html', 'report.html']
+    pytest_args += ['--html', 'summary.html']
     pytest.main(pytest_args)

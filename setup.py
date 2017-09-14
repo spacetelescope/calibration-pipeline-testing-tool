@@ -30,7 +30,7 @@ conf = ConfigParser()
 conf.read(['setup.cfg'])
 metadata = dict(conf.items('metadata'))
 
-PACKAGENAME = metadata.get('package_name', 'calibration_pipeline_testing_tool')
+PACKAGENAME = metadata.get('package_name', 'caltest')
 DESCRIPTION = metadata.get('description', 'calibration pipeline testing tool')
 AUTHOR = metadata.get('author', 'Matthew Hill')
 AUTHOR_EMAIL = metadata.get('author_email', '')

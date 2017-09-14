@@ -1,4 +1,4 @@
-name: calibration_pipeline_testing_tool
+name: caltest
 
 channels:
     - astropy
