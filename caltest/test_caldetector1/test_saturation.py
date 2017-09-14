@@ -3,6 +3,8 @@ import numpy as np
 import pytest
 from astropy.io import fits
 from jwst.saturation import SaturationStep
+from jwst import datamodels
+
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
@@ -18,7 +20,8 @@ def fits_saturation(fits_output):
 
 def test_saturation_step(fits_input):
     """Make sure the DQInitStep runs without error."""
-    SaturationStep.call(fits_input, save_results=True)
+
+    SaturationStep.call(datamodels.open(fits_input), save_results=True)
 
 def test_groupdq_flagging(fits_output, fits_saturation):
 
@@ -35,7 +38,7 @@ def test_groupdq_flagging(fits_output, fits_saturation):
         satmask = fits_saturation['SCI'].data
 
     # flag pixels greater than saturation threshold
-    expected_groupdq = np.zeros_like(fits_output['GROUPDQ'])
+    expected_groupdq = np.zeros_like(fits_output['GROUPDQ'].data)
     flagged = fits_output['SCI'].data >= satmask
     expected_groupdq[flagged] = 2
 
@@ -43,4 +46,4 @@ def test_groupdq_flagging(fits_output, fits_saturation):
     flagged = np.cumsum(expected_groupdq == 2, axis=1) > 0
     expected_groupdq[flagged] = 2
 
-    assert np.all(fits_output['GROUPDQ'] == expected_groupdq)
+    assert np.all(fits_output['GROUPDQ'].data == expected_groupdq)
