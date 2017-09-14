@@ -1,6 +1,6 @@
 import numpy as np
 from astropy.io import fits
-from jwst.satuation import SaturationStep
+from jwst.saturation import SaturationStep
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
