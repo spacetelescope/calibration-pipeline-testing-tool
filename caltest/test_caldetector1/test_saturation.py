@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pytest
 from astropy.io import fits
@@ -31,7 +32,7 @@ def test_groupdq_flagging(fits_output, fits_saturation):
                   xstart - 1:xstart + xsize - 1]
 
     else:
-        satmask = fits_reffile['SCI'].data
+        satmask = fits_saturation['SCI'].data
 
     # flag pixels greater than saturation threshold
     expected_groupdq = np.zeros_like(fits_output['GROUPDQ'])
