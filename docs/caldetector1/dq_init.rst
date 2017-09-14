@@ -34,3 +34,7 @@ Test Results
 ============
 
 
+API/Reference
+=============
+
+.. automodapi:: calibration_pipeline_testing_tool.caldetector1.test_dq_init
