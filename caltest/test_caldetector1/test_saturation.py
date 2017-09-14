@@ -36,7 +36,7 @@ def test_groupdq_flagging(fits_output, fits_saturation):
 
     # flag pixels greater than saturation threshold
     expected_groupdq = np.zeros_like(fits_output['GROUPDQ'])
-    flagged = fits_output['GROUPDQ'].data >= satmask
+    flagged = fits_output['SCI'].data >= satmask
     expected_groupdq[flagged] = 2
 
     # make sure that pixels in groups after a flagged pixel are also flagged
