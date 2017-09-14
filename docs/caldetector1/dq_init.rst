@@ -12,29 +12,41 @@ the calibration pipeline online software documentation in http://ssb.stsci.edu/d
 
 Test Requirements
 =================
-#.	The PIXELDQ is initialized with the information from the reference file.
-#.	The GROUPDQ extensions are added to the data and all values are initialized zero.
-#.	A DQ_DEF extension with the definition of DQ flags should be present in all products.
-#.	Subarray exposures correctly extract the DQ values from the full frame reference file.
-#.	Error array is a 4-D array initialized to zero.
+
+====================================================================================== =======================================================================
+Requirement                                                                             Fulfilled by
+====================================================================================== =======================================================================
+The PIXELDQ is initialized with the information from the reference file.
+The GROUPDQ extensions are added to the data and all values are initialized zero.       `~caltest.test_caldetector1.test_dq_init.test_groupdq_initialization`
+A DQ_DEF extension with the definition of DQ flags should be present in all products.   `~caltest.test_caldetector1.test_dq_init.test_dq_def_initialization`
+Error array is a 4-D array initialized to zero.                                         `~caltest.test_caldetector1.test_dq_init.test_err_initialization`
+====================================================================================== =======================================================================
 
 Test Data
 =========
 
-.. todo:: Determine test data including at least one subarray case.
+The ``dq_init`` step is applied the same to all instruments and exposure types except the NIRSpec IRS2 mode; therefore,
+we choose to test one NIRCam FULL frame image and one SUB640 subarray image.
+
+.. todo:: Need NIRSpec IRS2.
 
 Test Procedure
 ==============
 
+To run these tests the ``config.json`` should contain the ``"dq_init"`` section for example:
+
+.. code-block:: json
+
+    {
+        "dq_init": [
+            "dq_init/jw82600004001_02101_00001_nrcb1_uncal.fits",
+            "dq_init/jw82600011001_02103_00001_nrcb1_uncal.fits"
+        ]
+    }
+
+Using the above ``config.json`` simply run:
+
 .. code-block:: bash
 
-    test_pipeline --dq_init <input_data>
+    test_pipeline --config config.json
 
-Test Results
-============
-
-
-API/Reference
-=============
-
-.. automodapi:: calibration_pipeline_testing_tool.caldetector1.test_dq_init

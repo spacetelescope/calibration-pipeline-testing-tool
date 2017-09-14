@@ -5,6 +5,7 @@ import os
 def run_test():
     parser = argparse.ArgumentParser(description="run test")
     parser.add_argument('--config', help='configuration file')
+    parser.add_argument('--save_pipeline_output', help='')
     args = parser.parse_args()
     print(os.path.dirname(__file__))
     pytest_args = ['-v']
