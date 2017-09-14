@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from astropy.io import fits
 from jwst.saturation import SaturationStep
 
