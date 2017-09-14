@@ -4,7 +4,6 @@ from datetime import datetime
 from py.xml import html
 import jwst
 import crds
-from jwst import datamodels
 import json
 
 
@@ -22,12 +21,14 @@ def pytest_generate_tests(metafunc):
     with open(metafunc.config.option.config) as config_file:
         config = json.load(config_file)
     if 'dq_init' in metafunc.module.__name__:
-        metafunc.parametrize("input_file", config['dq_init'], scope='session')
+        metafunc.parametrize("input_file", config['dq_init'], scope='module')
+    if 'saturation' in metafunc.module.__name__:
+        metafunc.parametrize("input_file", config['saturation'], scope='module')
 
 
-@pytest.fixture(scope='session')
-def input_model(input_file):
-    yield datamodels.open(input_file)
+@pytest.fixture(scope='module')
+def fits_input(input_file):
+    yield fits.open(input_file)
 
 
 @pytest.mark.optionalhook
