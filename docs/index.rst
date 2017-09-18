@@ -11,6 +11,6 @@ CALDETECTOR1
 
   caldetector1/dq_init.rst
   caldetector1/saturation.rst
+  caldetector1/superbias.rst
   caldetector1/linearity.rst
   caldetector1/dark_current.rst
-  caldetector1/superbias.rst
