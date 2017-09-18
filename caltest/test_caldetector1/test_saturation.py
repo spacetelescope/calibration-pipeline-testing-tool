@@ -38,8 +38,11 @@ def test_groupdq_flagging(fits_output, fits_saturation):
         satmask = fits_saturation['SCI'].data
 
     # flag pixels greater than saturation threshold
+    no_sat_bit = fits_saturation['DQ_DEF'].data['BIT'][list(fits_saturation['DQ_DEF'].data['NAME']).index('NO_SAT_CHECK')]
+    no_sat_check = (fits_saturation['DQ'].data & (1 << no_sat_bit)).astype(bool)
+    not_nan = ~np.isnan(fits_saturation['SCI'].data)
     expected_groupdq = np.zeros_like(fits_output['GROUPDQ'].data)
-    flagged = fits_output['SCI'].data >= satmask
+    flagged = (fits_output['SCI'].data >= satmask) & ~no_sat_check[np.newaxis, np.newaxis, :, :] & not_nan[np.newaxis, np.newaxis, :, :]
     expected_groupdq[flagged] = 2
 
     # make sure that pixels in groups after a flagged pixel are also flagged
