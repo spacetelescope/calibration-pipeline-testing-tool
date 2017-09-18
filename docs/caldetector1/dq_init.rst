@@ -16,7 +16,7 @@ Test Requirements
 ====================================================================================== =======================================================================
 Requirement                                                                             Fulfilled by
 ====================================================================================== =======================================================================
-The PIXELDQ is initialized with the information from the reference file.
+The PIXELDQ is initialized with the information from the reference file.                `~caltest.test_caldetector1.test_dq_init.test_pixeldq_initialization`
 The GROUPDQ extensions are added to the data and all values are initialized zero.       `~caltest.test_caldetector1.test_dq_init.test_groupdq_initialization`
 A DQ_DEF extension with the definition of DQ flags should be present in all products.   `~caltest.test_caldetector1.test_dq_init.test_dq_def_initialization`
 Error array is a 4-D array initialized to zero.                                         `~caltest.test_caldetector1.test_dq_init.test_err_initialization`

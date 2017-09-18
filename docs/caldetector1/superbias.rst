@@ -16,9 +16,12 @@ Darks should have enough S/N for all possible ramps for full frame and subarrays
 this test. Guiders don't have darks from CV3 because of a large chamber background (5 to 10 ADU/second vs. ~0.01
 ADU/second dark current expected).
 
-#. Check the bias is correctly subtracted for full frame and subarrays
-#. Compare with or a standalone routine and check that is the same results.
-#. Check that the PIXELDQ  array of the science exposure is correctly combined with the DQ array.
+=============================================================================================== ========================================================================
+ Requirement                                                                                     Fulfilled by
+=============================================================================================== ========================================================================
+ Check the bias is correctly subtracted.                                                         `~caltest.test_caldetector1.test_superbias.test_superbias_subtraction`
+ Check that the PIXELDQ  array of the science exposure is correctly combined with the DQ array.  `~caltest.test_caldetector1.test_superbias.test_pixeldq_propagation`
+=============================================================================================== ========================================================================
 
 Test Data
 =========
@@ -28,10 +31,24 @@ Test Data
 Test Procedure
 ==============
 
+Test Procedure
+==============
+
+To run these tests the ``config.json`` should contain the ``"superbias"`` section for example:
+
+.. code-block:: json
+
+    {
+        "superbias": [
+            "superbias/jw82600004001_02101_00001_nrcb1_dqinitstep_saturationstep.fits"
+        ]
+    }
+
+Using the above ``config.json`` simply run:
+
 .. code-block:: bash
 
-    test_pipeline --dark-current <input_data>
+    test_pipeline --config config.json
 
-Test Results
-============
+
 

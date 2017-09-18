@@ -20,10 +20,17 @@ def pytest_configure(config):
 def pytest_generate_tests(metafunc):
     with open(metafunc.config.option.config) as config_file:
         config = json.load(config_file)
-    if 'dq_init' in metafunc.module.__name__:
-        metafunc.parametrize("input_file", config['dq_init'], scope='module')
-    if 'saturation' in metafunc.module.__name__:
-        metafunc.parametrize("input_file", config['saturation'], scope='module')
+    steps = ['dq_init', 'saturation', 'superbias']
+    for step in steps:
+        if step in metafunc.module.__name__:
+            metafunc.parametrize("input_file", config[step], scope='module')
+
+    # if 'dq_init' in metafunc.module.__name__:
+    #     metafunc.parametrize("input_file", config['dq_init'], scope='module')
+    # if 'saturation' in metafunc.module.__name__:
+    #     metafunc.parametrize("input_file", config['saturation'], scope='module')
+    # if 'superbias' in metafunc.module.__name__:
+    #     metafunc.parametrize("input_file", config['superbias'], scope='module)
 
 
 @pytest.fixture(scope='module')

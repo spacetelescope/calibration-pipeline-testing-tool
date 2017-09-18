@@ -1,3 +1,5 @@
+from ..utils import bitwise_propagate
+
 import numpy as np
 import pytest
 from jwst.dq_init import DQInitStep
@@ -9,9 +11,18 @@ def fits_output(fits_input):
     yield fits.open(fits_input[0].header['filename'].replace('uncal', 'dqinitstep'))
     os.remove(fits_input[0].header['filename'].replace('uncal', 'dqinitstep'))
 
+@pytest.fixture(scope='module')
+def fits_mask(fits_output):
+    ref_path = fits_output['PRIMARY'].header['R_MASK']
+    ref_path = ref_path.replace('crds://', '/grp/crds/cache/references/jwst/')
+    return fits.open(ref_path)
+
 def test_dq_init_step(fits_input):
     """Make sure the DQInitStep runs without error."""
     DQInitStep.call(fits_input, save_results=True)
+
+def test_pixeldq_initialization(fits_output, fits_mask):
+    np.all(fits_output['PIXELDQ'].data == bitwise_propagate(fits_mask))
 
 def test_groupdq_initialization(fits_output):
     """
