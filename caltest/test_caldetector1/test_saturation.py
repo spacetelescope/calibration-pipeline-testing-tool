@@ -1,3 +1,5 @@
+from ..utils import extract_subarray, translate_dq
+
 import os
 import numpy as np
 import pytest
@@ -25,22 +27,12 @@ def test_saturation_step(fits_input):
 
 def test_groupdq_flagging(fits_output, fits_saturation):
 
-    # extract subarray
-    if fits_saturation['PRIMARY'].header['SUBARRAY'] == 'GENERIC':
-        xsize = fits_output['PRIMARY'].header['SUBSIZE1']
-        xstart = fits_output['PRIMARY'].header['SUBSTRT1']
-        ysize = fits_output['PRIMARY'].header['SUBSIZE2']
-        ystart = fits_output['PRIMARY'].header['SUBSTRT2']
-        satmask = fits_saturation['SCI'].data[ystart - 1:ysize + ystart - 1,
-                  xstart - 1:xstart + xsize - 1]
-
-    else:
-        satmask = fits_saturation['SCI'].data
-
+    satmask = extract_subarray(fits_saturation['SCI'].data, fits_output)
+    dqmask = translate_dq(fits_saturation)
+    dqmask = extract_subarray(dqmask, fits_output)
     # flag pixels greater than saturation threshold
-    no_sat_bit = fits_saturation['DQ_DEF'].data['BIT'][list(fits_saturation['DQ_DEF'].data['NAME']).index('NO_SAT_CHECK')]
-    no_sat_check = (fits_saturation['DQ'].data & (1 << no_sat_bit)).astype(bool)
-    not_nan = ~np.isnan(fits_saturation['SCI'].data)
+    no_sat_check = (dqmask & (1 << 21)).astype(bool)
+    not_nan = ~np.isnan(satmask)
     expected_groupdq = np.zeros_like(fits_output['GROUPDQ'].data)
     flagged = (fits_output['SCI'].data >= satmask) & ~no_sat_check[np.newaxis, np.newaxis, :, :] & not_nan[np.newaxis, np.newaxis, :, :]
     expected_groupdq[flagged] = 2

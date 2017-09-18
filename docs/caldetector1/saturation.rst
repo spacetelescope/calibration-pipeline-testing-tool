@@ -57,3 +57,7 @@ Using the above ``config.json`` simply run:
 
     test_pipeline --config config.json
 
+Reference/API
+=============
+
+.. automodapi:: caltest.test_caldetector1.test_saturation

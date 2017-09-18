@@ -31,9 +31,6 @@ Test Data
 Test Procedure
 ==============
 
-Test Procedure
-==============
-
 To run these tests the ``config.json`` should contain the ``"superbias"`` section for example:
 
 .. code-block:: json
@@ -50,5 +47,9 @@ Using the above ``config.json`` simply run:
 
     test_pipeline --config config.json
 
+Reference/API
+=============
+
+.. automodapi:: caltest.test_caldetector1.test_superbias
 
 

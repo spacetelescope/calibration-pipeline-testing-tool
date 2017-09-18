@@ -17,20 +17,23 @@ def pytest_configure(config):
     config._metadata['crds_context'] = crds.heavy_client.get_processing_mode('jwst')[1]
 
 
+def pytest_runtest_setup(item):
+    if item.config.getoption("config"):
+        with open(item.config.option.config) as config_file:
+            config = json.load(config_file)
+
+    module = item.nodeid.split('::')[0].split('/')[-1][:-3].replace('test_', '')
+    if module not in config.keys():
+        pytest.skip("No {} section in config".format(module))
+
+
 def pytest_generate_tests(metafunc):
     with open(metafunc.config.option.config) as config_file:
         config = json.load(config_file)
-    steps = ['dq_init', 'saturation', 'superbias']
+    steps = ['dq_init', 'saturation', 'superbias', 'linearity', 'dark_current']
     for step in steps:
-        if step in metafunc.module.__name__:
+        if step in metafunc.module.__name__ and config.get(step):
             metafunc.parametrize("input_file", config[step], scope='module')
-
-    # if 'dq_init' in metafunc.module.__name__:
-    #     metafunc.parametrize("input_file", config['dq_init'], scope='module')
-    # if 'saturation' in metafunc.module.__name__:
-    #     metafunc.parametrize("input_file", config['saturation'], scope='module')
-    # if 'superbias' in metafunc.module.__name__:
-    #     metafunc.parametrize("input_file", config['superbias'], scope='module)
 
 
 @pytest.fixture(scope='module')
@@ -53,7 +56,11 @@ def pytest_html_results_table_row(report, cells):
     full_string = report.nodeid
     module = full_string.split('::')[0].split('/')[-1][:-3].replace('test_', '')
     test = full_string.split('::')[1].split('[')[0]
-    data = full_string.split('::')[1].split('[')[-1][:-1]
+    if '[' in full_string:
+        data = full_string.split('::')[1].split('[')[-1][:-1]
+    else:
+        data = ''
+
     cells.insert(0, html.td(datetime.utcnow(), class_='col-time'))
     cells.insert(1, html.td(test, class_='col-time'))
     cells.insert(1, html.td(module, class_='col-time'))

@@ -44,7 +44,7 @@ def get_pixeldq_bit(name):
     else:
         return 'N/A'
 
-def bitwise_propagate(ref_hdul):
+def translate_dq(ref_hdul):
 
     dq = ref_hdul['DQ'].data.astype(np.uint32)
     expected_dq = np.zeros_like(dq)
@@ -59,3 +59,11 @@ def bitwise_propagate(ref_hdul):
         except KeyError:
             print("No DQ mnemonic "+row['NAME'])
     return expected_dq
+
+def extract_subarray(array, hdul):
+    xsize = hdul['PRIMARY'].header['SUBSIZE1']
+    xstart = hdul['PRIMARY'].header['SUBSTRT1']
+    ysize = hdul['PRIMARY'].header['SUBSIZE2']
+    ystart = hdul['PRIMARY'].header['SUBSTRT2']
+    return array[ystart - 1:ysize + ystart - 1,
+                  xstart - 1:xstart + xsize - 1]

@@ -1,4 +1,4 @@
-from ..utils import bitwise_propagate
+from ..utils import translate_dq
 
 import numpy as np
 import pytest
@@ -8,8 +8,10 @@ import os
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    yield fits.open(fits_input[0].header['filename'].replace('uncal', 'dqinitstep'))
-    os.remove(fits_input[0].header['filename'].replace('uncal', 'dqinitstep'))
+    fname = '_dqinitstep.'.join(fits_input[0].header['filename'].split('.'))
+    fname = fname.replace('_uncal', '')
+    yield fits.open(fname)
+    os.remove(fname)
 
 @pytest.fixture(scope='module')
 def fits_mask(fits_output):
@@ -22,7 +24,7 @@ def test_dq_init_step(fits_input):
     DQInitStep.call(fits_input, save_results=True)
 
 def test_pixeldq_initialization(fits_output, fits_mask):
-    np.all(fits_output['PIXELDQ'].data == bitwise_propagate(fits_mask))
+    np.all(fits_output['PIXELDQ'].data == translate_dq(fits_mask))
 
 def test_groupdq_initialization(fits_output):
     """

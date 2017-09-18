@@ -1,4 +1,4 @@
-from ..utils import bitwise_propagate
+from ..utils import translate_dq, extract_subarray
 
 import os
 import numpy as np
@@ -26,14 +26,18 @@ def test_superbias_step(fits_input):
     SuperBiasStep.call(datamodels.open(fits_input), save_results=True)
 
 def test_superbias_subtraction(fits_input, fits_output, fits_superbias):
-    bias_to_subtract = np.copy(fits_superbias['SCI'].data)
+
+    bias = extract_subarray(fits_superbias['SCI'].data, fits_input)
+    bias_to_subtract = np.copy(bias)
     bias_to_subtract[np.isnan(bias_to_subtract)] = 0
 
     assert np.allclose(fits_output['SCI'].data, (fits_input['SCI'].data - bias_to_subtract))
 
 def test_pixeldq_propagation(fits_input, fits_output, fits_superbias):
+    # translate dq flags to standard bits
+    pixeldq = translate_dq(fits_superbias)
+    # extract subarray
+    pixeldq = extract_subarray(pixeldq, fits_input)
 
-    pixeldq = np.bitwise_or(fits_input['PIXELDQ'].data,
-                            bitwise_propagate(fits_superbias))
+    assert np.all(fits_output['PIXELDQ'].data == np.bitwise_or(fits_input['PIXELDQ'].data, pixeldq))
 
-    assert np.all(fits_output['PIXELDQ'].data == pixeldq)
