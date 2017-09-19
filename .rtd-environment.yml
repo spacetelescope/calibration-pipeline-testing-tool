@@ -3,6 +3,7 @@ name: caltest
 channels:
     - astropy
     - http://ssb.stsci.edu/astroconda
+    - http://ssb.stsci.edu/conda-dev
 
 dependencies:
     - astropy
@@ -10,5 +11,6 @@ dependencies:
     - matplotlib
     - numpy
     - stsci_sphinx_theme
+    - jwst=0.7.8rc2
 #   - pip:
 #       - stsci
