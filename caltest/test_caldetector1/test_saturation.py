@@ -42,3 +42,12 @@ def test_groupdq_flagging(fits_output, fits_saturation):
     expected_groupdq[flagged] = 2
 
     assert np.all(fits_output['GROUPDQ'].data == expected_groupdq)
+
+def test_pixeldq_propagation(fits_input, fits_output, fits_saturation):
+
+    # translate dq flags to standard bits
+    pixeldq = translate_dq(fits_saturation)
+    # extract subarray
+    pixeldq = extract_subarray(pixeldq, fits_input)
+
+    assert np.all(fits_output['PIXELDQ'].data == np.bitwise_or(fits_input['PIXELDQ'].data, pixeldq))

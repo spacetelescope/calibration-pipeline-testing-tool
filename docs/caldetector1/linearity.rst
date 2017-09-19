@@ -24,29 +24,31 @@ Science Pipelines Documentation at http://ssb.stsci.edu/doc/jwst_git/docs/linear
 
 Test Requirements
 =================
-#. Independently for MIR and NIR data:
-    * Check that there are unique reference files for the different wavelength ranges and optical elements mentioned above (MIRI)
-    * Use simulated data/real data and a standalone code or IDT’s code compare with what you get with the pipeline. Check that the multiplication is done correctly.
-    * Repeat for observations at different wavelengths (MIRI).
-#. Repeat this for subarray
-#. Check it works for grouped and un-grouped data.
-#. Check that the DQ flags are propagated correctly.
-#. Validation Part 2: Use IDT pipeline and calculate the differences
-#. Validation Part 2: Determine the Linearity Correction error
-#. Validation Part 2: Check the accuracy near the saturation value. If it passes this test the saturation step is done correctly.
-
-Test Data
-=========
+=================================================== =======================================================================
+ Requirement                                         Fulfilled by
+=================================================== =======================================================================
+ Check that the multiplication is done correctly.    `~caltest.test_caldetector1.test_linearity.test_linearity_correction`
+ Check it works for grouped and un-grouped data.     `~caltest.test_caldetector1.test_linearity.test_linearity_correction`
+ Check that the DQ flags are propagated correctly.   `~caltest.test_caldetector1.test_linearity.test_pixeldq_propagation`
+=================================================== =======================================================================
 
 .. todo:: Determine test data including at least one subarray case.
 
 Test Procedure
 ==============
 
-.. code-block:: bash
+.. code-block:: json
 
-    test_pipeline --linearity <input_data>
+{
+    "linearity": [
+        "linearity/jw82600004001_02101_00001_nrcb1_dqinitstep_saturationstep_superbiasstep_refpixstep.fits",
+        "linearity/jw82600011001_02103_00001_nrcb1_dqinitstep_saturationstep_superbiasstep_refpixstep.fits",
+        "linearity/jw87600025001_02101_00001_nis_group_scale_dq_init_saturation_superbias_refpix.fits"
+    ]
+}
 
-Test Results
-============
+Reference/API
+=============
+
+.. automodapi:: caltest.test_caldetector1.test_linearity
 

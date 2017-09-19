@@ -26,19 +26,16 @@ Darks should have enough S/N for all possible ramps for full frame and subarrays
 this test. Guiders don't have darks from CV3 because of a large chamber background (5 to 10 ADU/second vs. ~0.01
 ADU/second dark current expected).
 
-#. Determine if dark subtraction works properly for all the different types of data, number of groups, and number of integrations and readout pattern.
-#. Repeat this for subarray
-#. When there are less frames in the reference file than in the data, check that there is a warning and the step is skipped
-#. Check that when there are more frames in the dark reference file the extra frames are ignored.
-#. Verify that when a dark has NaN, these are correctly assumed as zero and the PIXELDQ is set properly
-#. Verify that the DQ array of the dark is correctly combined with the PIXELDQ array of the science data.
-#. Verify that when the dark is not applied, the data is correctly flagged as such.
-#. Verify the Dark correction is done by integration for MIRI observations.
-
-Test Data
-=========
-
-.. todo:: Determine test data including at least one subarray case.
+========================================================================================================================= ===========================================================================
+Requirement                                                                                                               Fulfilled by
+========================================================================================================================= ===========================================================================
+When there are less frames in the reference file than in the data, check that there is a warning and the step is skipped   ``~caltest.test_caldetector1.test_dark_current.test_dark_subtraction``
+Check that when there are more frames in the dark reference file the extra frames are ignored.                             ``~caltest.test_caldetector1.test_dark_current.test_dark_subtraction``
+Verify that when a dark has NaN, these are correctly assumed as zero and the PIXELDQ is set properly                       ``~caltest.test_caldetector1.test_dark_current.test_dark_subtraction``
+Verify that the DQ array of the dark is correctly combined with the PIXELDQ array of the science data.                     ``~caltest.test_caldetector1.test_dark_current.test_pixeldq_propagation``
+Verify that when the dark is not applied, the data is correctly flagged as such.
+Verify the Dark correction is done by integration for MIRI observations.
+========================================================================================================================= ===========================================================================
 
 Test Procedure
 ==============
@@ -47,6 +44,8 @@ Test Procedure
 
     test_pipeline --dark-current <input_data>
 
-Test Results
-============
+Reference/API
+=============
+
+.. automodapi:: caltest.test_caldetector1.test_dark_current
 

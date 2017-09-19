@@ -42,3 +42,12 @@ def test_dark_subtraction(fits_input, fits_dark, fits_output):
         dark_correct[np.isnan(dark_correct)] = 0
         result = fits_input['SCI'].data - dark_correct
         assert np.allclose(result, fits_output['SCI'].data)
+
+def test_pixeldq_propagation(fits_input, fits_output, fits_dark):
+
+    # translate dq flags to standard bits
+    pixeldq = translate_dq(fits_dark)
+    # extract subarray
+    pixeldq = extract_subarray(pixeldq, fits_input)
+
+    assert np.all(fits_output['PIXELDQ'].data == np.bitwise_or(fits_input['PIXELDQ'].data, pixeldq))
