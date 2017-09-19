@@ -29,10 +29,10 @@ ADU/second dark current expected).
 ========================================================================================================================= ===========================================================================
 Requirement                                                                                                               Fulfilled by
 ========================================================================================================================= ===========================================================================
-When there are less frames in the reference file than in the data, check that there is a warning and the step is skipped   ``~caltest.test_caldetector1.test_dark_current.test_dark_subtraction``
-Check that when there are more frames in the dark reference file the extra frames are ignored.                             ``~caltest.test_caldetector1.test_dark_current.test_dark_subtraction``
-Verify that when a dark has NaN, these are correctly assumed as zero and the PIXELDQ is set properly                       ``~caltest.test_caldetector1.test_dark_current.test_dark_subtraction``
-Verify that the DQ array of the dark is correctly combined with the PIXELDQ array of the science data.                     ``~caltest.test_caldetector1.test_dark_current.test_pixeldq_propagation``
+When there are less frames in the reference file than in the data, check that there is a warning and the step is skipped   `~caltest.test_caldetector1.test_dark_current.test_dark_subtraction`
+Check that when there are more frames in the dark reference file the extra frames are ignored.                             `~caltest.test_caldetector1.test_dark_current.test_dark_subtraction`
+Verify that when a dark has NaN, these are correctly assumed as zero and the PIXELDQ is set properly                       `~caltest.test_caldetector1.test_dark_current.test_dark_subtraction`
+Verify that the DQ array of the dark is correctly combined with the PIXELDQ array of the science data.                     `~caltest.test_caldetector1.test_dark_current.test_pixeldq_propagation`
 Verify that when the dark is not applied, the data is correctly flagged as such.
 Verify the Dark correction is done by integration for MIRI observations.
 ========================================================================================================================= ===========================================================================
