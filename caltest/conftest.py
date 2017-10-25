@@ -5,7 +5,8 @@ from py.xml import html
 import jwst
 import crds
 import json
-
+import os
+import re
 
 def pytest_addoption(parser):
     parser.addoption("--config",
@@ -67,3 +68,18 @@ def pytest_html_results_table_row(report, cells):
     cells.pop()
     cells.pop(-2)
     cells.insert(3, html.td(data, class_='col-time'))
+
+@pytest.mark.hookwrapper
+def pytest_runtest_makereport(item, call):
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    outcome = yield
+    report = outcome.get_result()
+    extra = getattr(report, 'extra', [])
+    if report.when == 'call':
+        # get filename between square brackets
+        m = re.match('^.*\[(.*)\].*$', item.name)
+        fname = item.name.split('[')[0]+'_'+m.group(1).split('/')[-1][:-5]+'.png'
+        # always add url to report
+        if os.path.isfile(fname):
+            extra.append(pytest_html.extras.image(fname))
+        report.extra = extra

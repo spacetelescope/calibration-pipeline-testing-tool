@@ -57,7 +57,8 @@ def translate_dq(ref_hdul):
             # propagate into the PIXELDQ extension
             expected_dq = np.bitwise_or(expected_dq, flagged)
         except KeyError:
-            print("No DQ mnemonic "+row['NAME'])
+            pass
+            # print("No DQ mnemonic "+row['NAME'])
     return expected_dq
 
 def extract_subarray(array, hdul):
@@ -67,3 +68,10 @@ def extract_subarray(array, hdul):
     ystart = hdul['PRIMARY'].header['SUBSTRT2']
     return array[ystart - 1:ysize + ystart - 1,
                   xstart - 1:xstart + xsize - 1]
+
+def dq_summary(pixeldq):
+    for flag, bit in dq_dict.items():
+        n = np.sum((pixeldq & (1 << bit)).astype(bool))
+        if n:
+            print("{} pixels flagged as {}".format(n, flag))
+    print("")

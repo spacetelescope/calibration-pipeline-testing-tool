@@ -1,4 +1,4 @@
-from ..utils import extract_subarray, translate_dq
+from ..utils import extract_subarray, translate_dq, dq_summary
 
 import os
 import numpy as np
@@ -50,4 +50,10 @@ def test_pixeldq_propagation(fits_input, fits_output, fits_saturation):
     # extract subarray
     pixeldq = extract_subarray(pixeldq, fits_input)
 
+    print('For step input')
+    dq_summary(fits_input['PIXELDQ'].data)
+    print('For reference file')
+    dq_summary(pixeldq)
+    print('For step output')
+    dq_summary(fits_output['PIXELDQ'].data)
     assert np.all(fits_output['PIXELDQ'].data == np.bitwise_or(fits_input['PIXELDQ'].data, pixeldq))

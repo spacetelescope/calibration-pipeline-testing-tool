@@ -5,11 +5,12 @@ import os
 def run_test():
     parser = argparse.ArgumentParser(description="run test")
     parser.add_argument('--config', help='configuration file')
-    parser.add_argument('--save_pipeline_output', help='')
+    # parser.add_argument('--save_pipeline_output', help='')
     args = parser.parse_args()
     print(os.path.dirname(__file__))
     pytest_args = ['-v']
     pytest_args += [os.path.dirname(__file__)]
     pytest_args += ['--config', args.config]
-    pytest_args += ['--html', 'summary.html']
+    pytest_args += ['--html', 'summary.html', '--self-contained-html']
+    # pytest_args += ['-n', '6']
     pytest.main(pytest_args)

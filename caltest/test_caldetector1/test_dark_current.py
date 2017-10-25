@@ -43,6 +43,9 @@ def test_dark_subtraction(fits_input, fits_dark, fits_output):
         result = fits_input['SCI'].data - dark_correct
         assert np.allclose(result, fits_output['SCI'].data)
 
+def test_dark_current_residuals(fits_input, fits_dark, fits_output):
+    fits_input['SCI'].data[]
+
 def test_pixeldq_propagation(fits_input, fits_output, fits_dark):
 
     # translate dq flags to standard bits

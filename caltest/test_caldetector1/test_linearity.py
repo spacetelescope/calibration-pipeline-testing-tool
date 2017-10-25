@@ -6,6 +6,8 @@ import pytest
 from astropy.io import fits
 from jwst.linearity import LinearityStep
 from jwst import datamodels
+import matplotlib.pyplot as plt
+import os
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
@@ -71,3 +73,19 @@ def test_pixeldq_propagation(fits_input, fits_output, fits_linearity):
     pixeldq = extract_subarray(pixeldq, fits_input)
 
     assert np.all(fits_output['PIXELDQ'].data == np.bitwise_or(fits_input['PIXELDQ'].data, pixeldq))
+
+def test_linearity_residuals(fits_input, fits_output):
+    ints, groups, nx, ny = fits_output['SCI'].data.shape
+    ramps = np.ma.array(fits_output['SCI'].data[0,:,:,:],
+                        mask=fits_output['GROUPDQ'].data[0,:,:,:].astype(bool))
+    ramps = ramps.reshape((groups, nx*ny))
+    x = np.ma.array(np.arange(ramps.shape[0]), mask=ramps[:, 512*512].mask)
+    p = np.ma.polyfit(x, ramps[:, 512*512], 1)
+    val = np.polyval(p, x)
+
+    # make plot
+    base = fits_input[0].header['FILENAME'].split('.')[0]
+    plot_fname = 'test_linearity_residuals_'+base+'.png'
+    plt.plot(x, ramps[:, 512*512],'o')
+    plt.plot(x, val)
+    plt.savefig(plot_fname)
