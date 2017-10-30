@@ -23,7 +23,8 @@ def pytest_runtest_setup(item):
         with open(item.config.option.config) as config_file:
             config = json.load(config_file)
 
-    module = item.nodeid.split('::')[0].split('/')[-1][:-3].replace('test_', '')
+    module, ext = os.path.splitext(os.path.basename(item.fspath))
+    module = module.replace('test_', '')
     if module not in config.keys():
         pytest.skip("No {} section in config".format(module))
 
