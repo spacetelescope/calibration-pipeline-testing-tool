@@ -29,10 +29,12 @@ def test_superbias_step(fits_input):
     SuperBiasStep.call(datamodels.open(fits_input), save_results=True)
 
 def test_superbias_subtraction(fits_input, fits_output, fits_superbias):
+
     if fits_input[0].header['SUBARRAY'] == fits_superbias[0].header['SUBARRAY']:
         bias = fits_superbias['SCI'].data
     else:
         bias = extract_subarray(fits_superbias['SCI'].data, fits_input)
+
     bias_to_subtract = np.copy(bias)
     bias_to_subtract[np.isnan(bias_to_subtract)] = 0
 
