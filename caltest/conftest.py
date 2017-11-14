@@ -19,12 +19,16 @@ def pytest_configure(config):
 
 
 def pytest_runtest_setup(item):
+    # read the JSON config
     if item.config.getoption("config"):
         with open(item.config.option.config) as config_file:
             config = json.load(config_file)
 
-    module, ext = os.path.splitext(os.path.basename(item.fspath))
+    # get the name of the step being testing in current module
+    module, ext = os.path.splitext(item.fspath.basename)
     module = module.replace('test_', '')
+
+    # skip the tests for this step if no data was supplied
     if module not in config.keys():
         pytest.skip("No {} section in config".format(module))
 
@@ -33,6 +37,7 @@ def pytest_generate_tests(metafunc):
     with open(metafunc.config.option.config) as config_file:
         config = json.load(config_file)
     steps = ['dq_init', 'saturation', 'superbias', 'linearity', 'dark_current']
+    # parametrize tests with the input files supplied for that step
     for step in steps:
         if step in metafunc.module.__name__ and config.get(step):
             metafunc.parametrize("input_file", config[step], scope='module')
@@ -40,6 +45,7 @@ def pytest_generate_tests(metafunc):
 
 @pytest.fixture(scope='module')
 def fits_input(input_file):
+    # open the input_file defined above once for each module
     yield fits.open(input_file)
 
 
@@ -55,6 +61,7 @@ def pytest_html_results_table_header(cells):
 
 @pytest.mark.optionalhook
 def pytest_html_results_table_row(report, cells):
+    # get name of input file from test name
     full_string = report.nodeid
     module = full_string.split('::')[0].split('/')[-1][:-3].replace('test_', '')
     test = full_string.split('::')[1].split('[')[0]
@@ -79,8 +86,9 @@ def pytest_runtest_makereport(item, call):
     if report.when == 'call':
         # get filename between square brackets
         m = re.match('^.*\[(.*)\].*$', item.name)
-        fname = item.name.split('[')[0]+'_'+m.group(1).split('/')[-1][:-5]+'.png'
+        fname = item.name.split('[')[0]+'_'+m.group(1).split('/')[-1][:-5]+'.pdf'
         # always add url to report
         if os.path.isfile(fname):
+            # add plot if it exists
             extra.append(pytest_html.extras.image(fname))
         report.extra = extra

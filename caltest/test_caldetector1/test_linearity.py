@@ -75,17 +75,27 @@ def test_pixeldq_propagation(fits_input, fits_output, fits_linearity):
     assert np.all(fits_output['PIXELDQ'].data == np.bitwise_or(fits_input['PIXELDQ'].data, pixeldq))
 
 def test_linearity_residuals(fits_input, fits_output):
-    ints, groups, nx, ny = fits_output['SCI'].data.shape
-    ramps = np.ma.array(fits_output['SCI'].data[0,:,:,:],
-                        mask=fits_output['GROUPDQ'].data[0,:,:,:].astype(bool))
-    ramps = ramps.reshape((groups, nx*ny))
-    x = np.ma.array(np.arange(ramps.shape[0]), mask=ramps[:, 512*512].mask)
-    p = np.ma.polyfit(x, ramps[:, 512*512], 1)
-    val = np.polyval(p, x)
+    """
+    Calculate the second difference of the linearity corrected ramp for each 
+    pixel. If the ramp is perfectly linear they should be zero.
+    """
+
+    nints, ngroups, nx, ny = fits_output['SCI'].data.shape
+    data_by_pixel = fits_output['SCI'].data.reshape(nints, ngroups, nx * ny)
+    groupdq_by_pixel = fits_output['GROUPDQ'].data.reshape(nints, ngroups,
+                                                           nx * ny)
+    masked_output = np.ma.array(data_by_pixel, mask=groupdq_by_pixel.astype(bool))
+    masked_input = np.ma.array(fits_input['SCI'].data.reshape(nints, ngroups, nx * ny),
+                               mask=groupdq_by_pixel.astype(bool))
+    second_diff = np.ma.diff(masked_output, n=2, axis=1)
 
     # make plot
     base = fits_input[0].header['FILENAME'].split('.')[0]
-    plot_fname = 'test_linearity_residuals_'+base+'.png'
-    plt.plot(x, ramps[:, 512*512],'o')
-    plt.plot(x, val)
+    plot_fname = 'test_linearity_residuals_'+base+'.pdf'
+    plt.clf()
+    plt.plot(masked_input.data[0, 1:-1, :].flatten(),
+             second_diff.data[0, :, :].flatten(), ',k', alpha=.01)
+    plt.ylim(-250, 250)
+    plt.ylabel('Second Difference')
+    plt.xlabel('Uncorrected Counts (DN)')
     plt.savefig(plot_fname)

@@ -54,11 +54,13 @@ def test_superbias_residuals(fits_output, fits_input):
     # normaltest(fits_output['SCI'].data)
     # make plot
     base = fits_input[0].header['FILENAME'].split('.')[0]
-    plot_fname = 'test_superbias_residuals_'+base+'.png'
+    plot_fname = 'test_superbias_residuals_'+base+'.pdf'
     plt.clf()
     plt.hist(fits_output['SCI'].data[0,0,:,:].flatten(),
              range=(median - 5 * std, median + 5 * std),
              bins=100)
+    plt.xlabel('First Frame Counts')
+    plt.ylabel('Number of Pixels')
     plt.savefig(plot_fname)
 
 
@@ -66,7 +68,8 @@ def test_pixeldq_propagation(fits_input, fits_output, fits_superbias):
     # translate dq flags to standard bits
     pixeldq = translate_dq(fits_superbias)
     # extract subarray
-    pixeldq = extract_subarray(pixeldq, fits_input)
+    if fits_superbias[0].header['SUBARRAY'] == 'GENERIC':
+        pixeldq = extract_subarray(pixeldq, fits_input)
 
     assert np.all(fits_output['PIXELDQ'].data == np.bitwise_or(fits_input['PIXELDQ'].data, pixeldq))
 
