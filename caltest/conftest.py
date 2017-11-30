@@ -86,7 +86,7 @@ def pytest_runtest_makereport(item, call):
     if report.when == 'call':
         # get filename between square brackets
         m = re.match('^.*\[(.*)\].*$', item.name)
-        fname = item.name.split('[')[0]+'_'+m.group(1).split('/')[-1][:-5]+'.pdf'
+        fname = item.name.split('[')[0]+'_'+m.group(1).split('/')[-1][:-5]+'.png'
         # always add url to report
         if os.path.isfile(fname):
             # add plot if it exists

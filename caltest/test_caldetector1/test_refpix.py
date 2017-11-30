@@ -15,61 +15,36 @@ def fits_output(fits_input):
     # delete the output FITS file after this module is finished
     os.remove(fname)
 
-
-def median_refpix(array, smoothing_length, pixel_dq):
-    # This code computes the median reference pixel value in teh "use_side_ref_pix = True" option of the reference pixel correction.
-    # array must be 2048x4
-
-
-    # first pad array with reflect
-
-    parray = np.pad(array,
-                    ((smoothing_length // 2, smoothing_length // 2), (0, 0)),
-                    'reflect')
-    ppdq = np.pad(pixel_dq,
-                  ((smoothing_length // 2, smoothing_length // 2), (0, 0)),
-                  'constant', constant_values=0)
-    xmin = smoothing_length
-    xmax = 2048 + smoothing_length - 1
-
-    med_arr = np.zeros(2048)
-
-    for i in range(2048):
-        sub_array = parray[
-                    i + smoothing_length // 2 - smoothing_length // 2:i + smoothing_length // 2 + smoothing_length // 2 + 1,
-                    :]
-        sub_pdq = ppdq[
-                  i + smoothing_length // 2 - smoothing_length // 2:i + smoothing_length // 2 + smoothing_length // 2 + 1,
-                  :]
-        good = np.where(sub_pdq != 1)
-        med_arr[i] = np.median(sub_array[good])
-
-    return (med_arr)
-
 def test_refpix_step(fits_input):
     """Make sure the DQInitStep runs without error."""
 
     RefPixStep.call(datamodels.open(fits_input), save_results=True)
 
-@pytest.mark.parametrize("odd_even_columns", [True, False])
-@pytest.mark.parametrize("use_side_ref_pixels", [True, False])
-def test_refpix_correction(fits_input, fits_output, odd_even_columns, use_side_ref_pixels):
+def test_refpix_correction(fits_input, fits_output, use_side_ref_pixels=True,
+                           odd_even_columns=True, side_smoothing_length=11,
+                           side_gain=1.0):
     """
-    Test for the reference pixel correction
-    INPUTS:
-         "input_files", A list of input files (files that were input in the pipeline step
-         "ouput_files", A list of output files (files that were output by the pipeline step)
-         "input_files", "output_files" must have the same length
-         "test_key": A string to identify the text file written by the step, which contains the min/max/median/mean differences
-    OPTIONAL PARAMETERS:
-         Same as those used in the reference pixel correction
-    OUTPUTS:
-         NONE
-         This step will write a text file ('refpix_testing_results' +... + '.dat') containing some stats on the differences found. "..." stands for suffixes reflecting which optinoal paramaeters were used.
-         This step will also write fits files (input_files + '_refpix_dif_val.fits', '_refpix_exp_out.fits', 'refpix_means.fits') with 1) the fractional difference (pipeline-mine)/mine), 2) my output, 3) the 1D means array
+    Reference pixel correction implementation by Julia Duval.
+    
+    Parameters
+    ----------
+    fits_input: astropy.io.fits.HDUList
+        Input data for RefPixStep
+    fits_output: astropy.io.fits.HDUList
+        Output data after RefPixStep is run.
+    use_side_ref_pixels: bool, optional
+        Whether the RefPixStep was run with `use_side_ref_pixels` 
+        (default is True, same as `jwst.refpix.RefPixStep`)
+    odd_even_columns: bool
+        Whether the RefPixStep was run with `odd_even_columns`
+        (default is True, same as `jwst.refpix.RefPixStep`)
+    side_smoothing_length: int
+        `side_smoothing_length` used by `RefPixStep`
+        (default is 11, same as `jwst.refpix.RefPixStep`)
+    side_gain: float
+        `side_gain` used by `RefPixStep`
+        (default is 11, same as `jwst.refpix.RefPixStep`)       
     """
-    side_smoothing_length = 11
-    side_gain = 1.
 
     delta_amp = 512
     if odd_even_columns==False:
@@ -86,14 +61,6 @@ def test_refpix_correction(fits_input, fits_output, odd_even_columns, use_side_r
         sci_in = data_in[1].data
         sci_out = data_out[1].data
 
-        # dif_in_out = sci_out - sci_in
-        # file = input_files[i]
-        # dif_file = file.replace(".fits",
-        #                         "refpix_dif_int-out" + oe_key + skey + ".fits")
-        # dif_hdu = fits.PrimaryHDU(dif_in_out)
-        # hdulist = fits.HDUList([dif_hdu])
-        # hdulist.writeto(dif_file, clobber=True)
-
         gdq_in = data_in[3].data
         pdq_in = data_in[2].data
 
@@ -102,6 +69,11 @@ def test_refpix_correction(fits_input, fits_output, odd_even_columns, use_side_r
         niter = sci_shape[0]
         ngroup = sci_shape[1]
 
+        if data_in[0].header['INSTRUME'] != 'NIRISS':
+            pytest.skip('This test has only been implemented for NIRISS')
+
+        # change to detector coordinate
+        # TODO make coordinate changes for other instruments
         fsci_in = np.swapaxes(sci_in, 2, 3)[:, :, ::-1, ::-1]
         fsci_out = np.swapaxes(sci_out, 2, 3)[:, :, ::-1, ::-1]
 
@@ -149,8 +121,6 @@ def test_refpix_correction(fits_input, fits_output, odd_even_columns, use_side_r
                         valid_bottom = np.where(
                             (sub_pdq_bottom != 1) & (sub_gdq_bottom != 1))
 
-                        # top_means[it, ig,ia, io] = np.mean(sigma_clip(sub_sci_top[valid_top]))
-                        # bottom_means[it, ig, ia,io] = np.mean(sigma_clip(sub_sci_bottom[valid_bottom]))
                         top_means[it, ig, ia, io] = np.mean(
                             sigmaclip(sub_sci_top[valid_top], low=3.0,
                                       high=3.0).clipped)
@@ -191,5 +161,44 @@ def test_refpix_correction(fits_input, fits_output, odd_even_columns, use_side_r
 
         exp_sci_out = np.swapaxes(fexp_sci_out, 2, 3)[:, :, ::-1, ::-1]
 
+        dif = sci_out - exp_sci_out
+        mins = np.min(dif)
+        maxs = np.max(dif)
+        good = np.where(sci_out != 0.)
+        if len(good[0]) > 0:
+            fmins = np.min(dif[good] / sci_out[good])
+            fmaxs = np.max(dif[good] / sci_out[good])
+        print('mins maxs frac_min frac_max')
+        print('{} {} {} {}'.format(mins, maxs, fmins, fmaxs))
+
         assert np.allclose(sci_out, exp_sci_out)
 
+def median_refpix(array, smoothing_length, pixel_dq):
+    # This code computes the median reference pixel value in teh "use_side_ref_pix = True" option of the reference pixel correction.
+    # array must be 2048x4
+
+
+    # first pad array with reflect
+
+    parray = np.pad(array,
+                    ((smoothing_length // 2, smoothing_length // 2), (0, 0)),
+                    'reflect')
+    ppdq = np.pad(pixel_dq,
+                  ((smoothing_length // 2, smoothing_length // 2), (0, 0)),
+                  'constant', constant_values=0)
+    xmin = smoothing_length
+    xmax = 2048 + smoothing_length - 1
+
+    med_arr = np.zeros(2048)
+
+    for i in range(2048):
+        sub_array = parray[
+                    i + smoothing_length // 2 - smoothing_length // 2:i + smoothing_length // 2 + smoothing_length // 2 + 1,
+                    :]
+        sub_pdq = ppdq[
+                  i + smoothing_length // 2 - smoothing_length // 2:i + smoothing_length // 2 + smoothing_length // 2 + 1,
+                  :]
+        good = np.where(sub_pdq != 1)
+        med_arr[i] = np.median(sub_array[good])
+
+    return (med_arr)
