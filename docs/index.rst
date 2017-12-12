@@ -5,12 +5,13 @@ This is the documentation for calibration-pipeline-testing-tool.
 
 Installation
 ============
-Create a JWST pipeline environment to install into
+Create a JWST pipeline environment to install into and install `pytest-html`
 
 .. code::
 
-  conda create -n test-0.7.8rc2 --file http://ssb.stsci.edu/releases/jwstdp/0.7.8/dev/jwstdp-0.7.8rc2-osx-py27.0.txt
-  source activate test-0.7.8rc2
+  conda create -n test_jwst --file http://ssb.stsci.edu/releases/jwstdp/0.7.8/latest-osx
+  source activate test_jwst
+  pip install pytest-html
 
 .. code:: bash
 
@@ -18,6 +19,64 @@ Create a JWST pipeline environment to install into
   cd calibration-pipeline-testing-tool
   python setup.py install
 
+Basic Usage
+===========
+
+To setup tests, you specify test input files in a JSON file, with an entry for each step.
+You do not need to provide input for every step.  The below example shows all currently available steps
+
+.. code:: json
+
+  {
+      "dq_init": [
+          "dq_init_input.fits"
+      ],
+
+      "saturation": [
+          "saturation_input.fits"
+      ],
+
+      "superbias": [
+          "superbias_input.fits"
+      ],
+
+      "dark_current": [
+          "dark_current_input.fits"
+      ],
+
+      "refpix": [
+          "refpix_input.fits"
+      ],
+
+      "linearity": [
+          "linearity_input.fits"
+      ],
+
+      "rscd": [
+          "rscd_input.fits"
+      ],
+
+      "lastframe": [
+          "lastframe_input.fits"
+      ],
+
+      "jump": [
+          "jump_input.fits"
+      ],
+
+      "ramp_fit": [
+          "ramp_fit_input.fits"
+      ]
+  }
+
+Then from the command line simply run
+
+.. code:: bash
+
+  test_pipeline --config confg.json
+
+This will produce a ``summary.html`` file with the test results.  Note that this file and the associated plots will be
+saved in the current directory so it may be useful to run ``test_pipeline`` in a new directory.
 
 CALDETECTOR1
 ============
@@ -30,3 +89,8 @@ CALDETECTOR1
   caldetector1/superbias.rst
   caldetector1/linearity.rst
   caldetector1/dark_current.rst
+  caldetector1/refpix.rst
+  caldetector1/rscd.rst
+  caldetector1/lastframe.rst
+  caldetector1/jump.rst
+  caldetector1/ramp_fit.rst
