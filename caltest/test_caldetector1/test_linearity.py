@@ -91,7 +91,7 @@ def test_linearity_residuals(fits_input, fits_output):
 
     # make plot
     base = fits_input[0].header['FILENAME'].split('.')[0]
-    plot_fname = 'test_linearity_residuals_'+base+'.pdf'
+    plot_fname = 'test_linearity_residuals_'+base+'.png'
     plt.clf()
     plt.plot(masked_input.data[0, 1:-1, :].flatten(),
              second_diff.data[0, :, :].flatten(), ',k', alpha=.01)

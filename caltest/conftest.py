@@ -36,7 +36,8 @@ def pytest_runtest_setup(item):
 def pytest_generate_tests(metafunc):
     with open(metafunc.config.option.config) as config_file:
         config = json.load(config_file)
-    steps = ['dq_init', 'saturation', 'superbias', 'linearity', 'dark_current']
+    steps = ['dq_init', 'saturation', 'superbias', 'linearity', 'dark_current',
+             'jump', 'ramp_fit']
     # parametrize tests with the input files supplied for that step
     for step in steps:
         if step in metafunc.module.__name__ and config.get(step):
@@ -86,7 +87,7 @@ def pytest_runtest_makereport(item, call):
     if report.when == 'call':
         # get filename between square brackets
         m = re.match('^.*\[(.*)\].*$', item.name)
-        fname = item.name.split('[')[0]+'_'+m.group(1).split('/')[-1][:-5]+'.pdf'
+        fname = item.name.split('[')[0]+'_'+m.group(1).split('/')[-1][:-5]+'.png'
         # always add url to report
         if os.path.isfile(fname):
             # add plot if it exists

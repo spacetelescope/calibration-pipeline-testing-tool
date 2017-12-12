@@ -54,7 +54,7 @@ def test_superbias_residuals(fits_output, fits_input):
     # normaltest(fits_output['SCI'].data)
     # make plot
     base = fits_input[0].header['FILENAME'].split('.')[0]
-    plot_fname = 'test_superbias_residuals_'+base+'.pdf'
+    plot_fname = 'test_superbias_residuals_'+base+'.png'
     plt.clf()
     plt.hist(fits_output['SCI'].data[0,0,:,:].flatten(),
              range=(median - 5 * std, median + 5 * std),

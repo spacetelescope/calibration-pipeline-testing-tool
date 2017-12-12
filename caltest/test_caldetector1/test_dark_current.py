@@ -76,7 +76,7 @@ def test_dark_current_quality(fits_input, fits_output):
     plt.plot(med_in, label='input')
     plt.plot(med_out, label='output')
     base = fits_input[0].header['FILENAME'].split('.')[0]
-    plot_fname = 'test_dark_current_quality_'+base+'.pdf'
+    plot_fname = 'test_dark_current_quality_'+base+'.png'
     plt.xlabel('Group Number')
     plt.ylabel('Counts')
     plt.savefig(plot_fname)
