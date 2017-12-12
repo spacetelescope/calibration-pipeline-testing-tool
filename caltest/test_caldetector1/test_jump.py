@@ -5,6 +5,7 @@ from jwst import datamodels
 from astropy.io import fits, ascii
 from astropy.table import Table
 import os
+import matplotlib.pyplot as plt
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
@@ -19,8 +20,20 @@ def test_jump_step(fits_input):
     JumpStep.call(datamodels.open(fits_input), save_results=True)
 
 
-def test_jump_performance(fits_output, rejection_threshold=5.0,
+def test_jump_performance(fits_input, fits_output, rejection_threshold=4.0,
                           do_yintercept=False, yint_threshold=1.0):
+    """
+    Check how well the Jump step detects injected cosmic rays
+    
+    Parameters
+    ----------
+    fits_input
+    fits_output
+    rejection_threshold
+    do_yintercept
+    yint_threshold
+
+    """
     # Test function for the jump correction. Type should be set to "cv3_dark" as in "run_jump_testing()". Output_file is the file output by the pipeline after the jump correction. Optional paramters are the same as for the jump correction.
 
     rej_key = str(rejection_threshold).strip()
@@ -56,7 +69,7 @@ def test_jump_performance(fits_output, rejection_threshold=5.0,
 
     # just get the jump bit
     # print("BIN DECOMP ", binary.shape, powers.shape)
-    binary_jump = (fits_output['GROUPDQ'].data & (1 << 1)).astype(bool).astype('uint32')[0, :, :, :]
+    binary_jump = (gdq_out & (1 << 2)).astype(bool).astype('uint32')[0, :, :, :]
     print("TRUNC BIN ", binary_jump.shape)
 
     # Create an zero array that will contain where the jump flags should be
@@ -145,7 +158,7 @@ def test_jump_performance(fits_output, rejection_threshold=5.0,
 
 
     # Look into the jumps not detected or false positives
-    bad = np.where(dif == 1)
+    bad = np.where(dif != 0)
     zbad = bad[0]
     ybad = bad[1]
     xbad = bad[2]
@@ -176,13 +189,50 @@ def test_jump_performance(fits_output, rejection_threshold=5.0,
         jump_val[i] = jump_values[zbad[i], ybad[i], xbad[i]]
         gdq_val[i] = gdq_out[0, zbad[i], ybad[i], xbad[i]]
 
-    bad_set = Table(
+    t = Table(
         {'x': xbad, 'cl_x': closest_x, 'y': ybad, 'cl_y': closest_y, 'z': zbad,
          'cl_z': closest_z, 'jump_val': jump_val, 'gdq_val': gdq_val,
          'cl_set': closest_set, 'cl_sample': closest_sample,
          'cl_ampl': closest_ampl},
         names=['x', 'cl_x', 'y', 'cl_y', 'z', 'cl_z', 'jump_val', 'gdq_val',
                'cl_set', 'cl_sample', 'cl_ampl'])
-    print(bad_set)
-    # ascii.write(bad_set,
-    #             'one_ramp_' + type + '/bad_sets_' + type + "_" + rej_key + "_" + yint_key + doyint_key + '.dat')
+    print(t)
+    z = t['z'].data
+    x = t['x'].data
+    y = t['y'].data
+    val = t['jump_val'].data
+    gdq_val = t['gdq_val'].data
+
+    allcr = np.where(exp_binary_jump != 0)
+    badcr = np.where((exp_binary_jump != 0) & (binary_jump == 0))
+
+    print("Number of CR pixels", len(allcr[0]))
+    print("Number of undetected CR pixels", len(badcr[0]))
+
+
+    allbad = np.where((x > 3) & (x < 2044) & (y > 3) & (y < 2044))
+    badsat = np.where((x > 3) & (x < 2044) & (y > 3) & (y < 2044) & (gdq_val == 2))
+    bad_nonsat =  np.where((x > 3) & (x < 2044) & (y > 3) & (y < 2044) & (gdq_val == 0))
+
+    verybad = np.where((x > 3) & (x < 2044) & (y > 3) & (y < 2044)  & (val > 100) & (gdq_val == 0))
+    verybad_lowz = np.where((x > 3) & (x < 2044) & (y > 3) & (y < 2044)  & (val > 100) & (gdq_val == 0) & (z < 10))
+
+    low_ampl = np.where((x > 3) & (x < 2044) & (y > 3) & (y < 2044)  & (val < 100) & (gdq_val == 0))
+
+    print("Number of bad undetected CRs", len(verybad[0]))
+    print("Number of bad undetected CRs at low z", len(verybad_lowz[0]))
+
+    print("Number of low undetected CRs", len(low_ampl[0]))
+
+    base = fits_input[0].header['FILENAME'].split('.')[0]
+
+    plot_fname = 'test_jump_performance_'+base+'.png'
+    plt.clf()
+    plt.cla()
+    plt.close()
+    plt.plot(z[bad_nonsat[0]], val[bad_nonsat[0]], 'k.')
+    plt.yscale('log')
+    plt.title("Amplitude of undetected jumps")
+    plt.ylabel("Amplitude")
+    plt.xlabel("Group Number")
+    plt.savefig(plot_fname)

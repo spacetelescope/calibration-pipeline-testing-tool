@@ -27,12 +27,10 @@ Test Requirements
 =================================================== =======================================================================
  Requirement                                         Fulfilled by
 =================================================== =======================================================================
- Check that the multiplication is done correctly.    `~caltest.test_caldetector1.test_linearity.test_linearity_correction`
+ Check that the multiplication is done correctly.    `~caltest.test_caldetector1.test_linearity.test_refpix_correction`
  Check it works for grouped and un-grouped data.     `~caltest.test_caldetector1.test_linearity.test_linearity_correction`
  Check that the DQ flags are propagated correctly.   `~caltest.test_caldetector1.test_linearity.test_pixeldq_propagation`
 =================================================== =======================================================================
-
-.. todo:: Determine test data including at least one subarray case.
 
 Test Procedure
 ==============
