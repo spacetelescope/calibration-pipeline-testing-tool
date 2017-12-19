@@ -10,7 +10,8 @@ from jwst import datamodels
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    fname = '_saturationstep.'.join(fits_input[0].header['filename'].split('.'))
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_saturationstep.fits')
     yield fits.open(fname)
     os.remove(fname)
 
@@ -22,8 +23,10 @@ def fits_saturation(fits_output):
 
 def test_saturation_step(fits_input):
     """Make sure the DQInitStep runs without error."""
-
-    SaturationStep.call(datamodels.open(fits_input), save_results=True)
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_saturationstep.fits')
+    SaturationStep.call(datamodels.open(fits_input), output_file=fname,
+                        save_results=True)
 
 def test_groupdq_flagging(fits_output, fits_saturation):
 

@@ -9,8 +9,7 @@ import matplotlib.pyplot as plt
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    fname = fits_input[0].header['filename'].replace('jump', 'rampfitstep_0')
-    # fname = '_rampfitstep_0.'.join(fits_input[0].header['filename'].split('.'))
+    fname = fits_input[0].header['filename'].replace('.fits', '_rampfitstep.fits')
     yield fits.open(fname)
     # delete the output FITS file after this module is finished
     os.remove(fname)
@@ -23,8 +22,8 @@ def fits_gain(fits_output):
 
 def test_ramp_fit_step(fits_input):
     """Make sure the RampFitStep runs without error."""
-
-    RampFitStep.call(datamodels.open(fits_input), save_results=True)
+    fname = fits_input[0].header['filename'].replace('.fits', '_rampfitstep.fits')
+    RampFitStep.call(datamodels.open(fits_input), output_file=fname, save_results=True)
 
 def test_ramp_fit_slopes(fits_input, fits_output, fits_gain):
     """

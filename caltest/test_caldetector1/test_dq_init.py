@@ -8,8 +8,8 @@ import os
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    fname = '_dqinitstep.'.join(fits_input[0].header['filename'].split('.'))
-    fname = fname.replace('_uncal', '')
+    fname = fits_input['PRIMARY'].header['filename'].replace('.fits',
+                                                             '_dqinitstep.fits')
     yield fits.open(fname)
     os.remove(fname)
 
@@ -21,7 +21,9 @@ def fits_mask(fits_output):
 
 def test_dq_init_step(fits_input):
     """Make sure the DQInitStep runs without error."""
-    DQInitStep.call(fits_input, save_results=True)
+    fname = fits_input['PRIMARY'].header['filename'].replace('.fits',
+                                                             '_dqinitstep.fits')
+    DQInitStep.call(fits_input, output_file=fname, save_results=True)
 
 def test_pixeldq_initialization(fits_output, fits_mask):
     np.all(fits_output['PIXELDQ'].data == translate_dq(fits_mask))

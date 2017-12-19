@@ -11,7 +11,8 @@ import os
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    fname = '_linearitystep.'.join(fits_input[0].header['filename'].split('.'))
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_linearitystep.fits')
     yield fits.open(fname)
     os.remove(fname)
 
@@ -23,8 +24,10 @@ def fits_linearity(fits_output):
 
 def test_linearity_step(fits_input):
     """Make sure the LinearityStep runs without error."""
-
-    LinearityStep.call(datamodels.open(fits_input), save_results=True)
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_linearitystep.fits')
+    LinearityStep.call(datamodels.open(fits_input), output_file=fname,
+                       save_results=True)
 
 def extract_coeffs(coeffs, hdul):
     xsize = hdul['PRIMARY'].header['SUBSIZE1']

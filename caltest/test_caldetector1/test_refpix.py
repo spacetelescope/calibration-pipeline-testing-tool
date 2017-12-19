@@ -10,15 +10,19 @@ from ..utils import translate_dq, extract_subarray
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    fname = '_refpixstep.'.join(fits_input[0].header['filename'].split('.'))
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_refpixstep.fits')
     yield fits.open(fname)
     # delete the output FITS file after this module is finished
     os.remove(fname)
 
 def test_refpix_step(fits_input):
     """Make sure the DQInitStep runs without error."""
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_refpixstep.fits')
 
-    RefPixStep.call(datamodels.open(fits_input), save_results=True)
+    RefPixStep.call(datamodels.open(fits_input), output_file=fname,
+                    save_results=True)
 
 def test_refpix_correction(fits_input, fits_output, use_side_ref_pixels=True,
                            odd_even_columns=True, side_smoothing_length=11,

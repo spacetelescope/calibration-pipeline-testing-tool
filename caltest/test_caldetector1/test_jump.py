@@ -9,15 +9,16 @@ import matplotlib.pyplot as plt
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    fname = '_jumpstep.'.join(fits_input[0].header['filename'].split('.'))
+    fname = fits_input[0].header['filename'].replace('.fits', '_jumpstep.fits')
     yield fits.open(fname)
     # delete the output FITS file after this module is finished
     os.remove(fname)
 
 def test_jump_step(fits_input):
     """Make sure the JumpStep runs without error."""
-
-    JumpStep.call(datamodels.open(fits_input), save_results=True)
+    fname = fits_input[0].header['filename'].replace('.fits', '_jumpstep.fits')
+    JumpStep.call(datamodels.open(fits_input), output_file=fname,
+                  save_results=True)
 
 
 def test_jump_performance(fits_input, fits_output, rejection_threshold=4.0,
