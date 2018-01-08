@@ -37,8 +37,8 @@ def pytest_generate_tests(metafunc):
     with open(metafunc.config.option.config) as config_file:
         config = json.load(config_file)
     steps = ['dq_init', 'saturation', 'superbias', 'persistence',
-             'linearity', 'dark_current',
-             'jump', 'ramp_fit']
+             'linearity', 'dark_current', 'jump', 'ramp_fit',
+             'assign_wcs']
     # parametrize tests with the input files supplied for that step
     for step in steps:
         if step in metafunc.module.__name__ and config.get(step):
