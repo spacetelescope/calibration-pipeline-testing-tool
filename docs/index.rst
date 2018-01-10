@@ -78,6 +78,11 @@ Then from the command line simply run
 This will produce a ``summary.html`` file with the test results.  Note that this file and the associated plots will be
 saved in the current directory so it may be useful to run ``test_pipeline`` in a new directory.
 
+Contributing
+============
+
+If you would like to contribute tests to the package see the :ref:`developer`.
+
 CALDETECTOR1
 ============
 
