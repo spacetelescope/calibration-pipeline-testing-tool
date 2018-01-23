@@ -42,8 +42,8 @@ def test_err_initialization(fits_output):
     assert fits_output['ERR'].data.ndim == 4
     assert np.all(fits_output['ERR'].data == 0)
 
-def test_dq_def_initialization(fits_output):
-    """
-    Check that a DQ_DEF extension with the definition of DQ flags is present.
-    """
-    assert 'DQ_DEF' in fits_output
+# def test_dq_def_initialization(fits_output):
+#     """
+#     Check that a DQ_DEF extension with the definition of DQ flags is present.
+#     """
+#     assert 'DQ_DEF' in fits_output
