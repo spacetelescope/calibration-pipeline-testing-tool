@@ -10,7 +10,8 @@ from ..utils import translate_dq, extract_subarray
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    fname = '_darkcurrentstep.'.join(fits_input[0].header['filename'].split('.'))
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_darkcurrentstep.fits')
     yield fits.open(fname)
     # delete the output FITS file after this module is finished
     os.remove(fname)
@@ -23,8 +24,10 @@ def fits_dark(fits_output):
 
 def test_dark_current_step(fits_input):
     """Make sure the DQInitStep runs without error."""
-
-    DarkCurrentStep.call(datamodels.open(fits_input), save_results=True)
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_darkcurrentstep.fits')
+    DarkCurrentStep.call(datamodels.open(fits_input), output_file=fname,
+                         save_results=True)
 
 def test_dark_subtraction(fits_input, fits_dark, fits_output):
     nframes = fits_output[0].header['NFRAMES']

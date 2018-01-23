@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 
 @pytest.fixture(scope='module')
 def fits_output(fits_input):
-    fname = '_superbiasstep.'.join(fits_input[0].header['filename'].split('.'))
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_superbiasstep.fits')
     yield fits.open(fname)
     os.remove(fname)
 
@@ -25,8 +26,10 @@ def fits_superbias(fits_output):
 
 def test_superbias_step(fits_input):
     """Make sure the DQInitStep runs without error."""
-
-    SuperBiasStep.call(datamodels.open(fits_input), save_results=True)
+    fname = fits_input[0].header['filename'].replace('.fits',
+                                                     '_superbiasstep.fits')
+    SuperBiasStep.call(datamodels.open(fits_input), output_file=fname,
+                       save_results=True)
 
 def test_superbias_subtraction(fits_input, fits_output, fits_superbias):
 
