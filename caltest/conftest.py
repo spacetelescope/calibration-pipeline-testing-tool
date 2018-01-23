@@ -36,13 +36,16 @@ def pytest_runtest_setup(item):
 def pytest_generate_tests(metafunc):
     with open(metafunc.config.option.config) as config_file:
         config = json.load(config_file)
-    steps = ['dq_init', 'saturation', 'superbias', 'linearity', 'dark_current',
-             'jump', 'ramp_fit']
+    steps = ['dq_init', 'saturation', 'superbias', 'persistence',
+             'linearity', 'dark_current', 'jump', 'ramp_fit',
+             'assign_wcs']
     # parametrize tests with the input files supplied for that step
     for step in steps:
         if step in metafunc.module.__name__ and config.get(step):
-            metafunc.parametrize("input_file", config[step], scope='module')
-
+            if step != "persistence":
+                metafunc.parametrize("input_file", config[step], scope='module')
+            else:
+                metafunc.parametrize(["input_file","trapsfilled"], config[step], scope='module')
 
 @pytest.fixture(scope='module')
 def fits_input(input_file):
