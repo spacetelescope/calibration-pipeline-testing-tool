@@ -23,7 +23,9 @@ Basic Usage
 ===========
 
 To setup tests, you specify test input files in a JSON file, with an entry for each step.
-You do not need to provide input for every step.  The below example shows all currently available steps
+You do not need to provide input for every step.  The below example shows all currently available steps.
+Any of the step names can be omitted and tests associated with that step will be skipped.
+Multiple FITS files can be supplied for any given step and the tests will be repeated for each supplied file.
 
 .. code:: json
 
@@ -75,8 +77,8 @@ Then from the command line simply run
 
   test_pipeline --config confg.json
 
-This will produce a ``summary.html`` file with the test results.  Note that this file and the associated plots will be
-saved in the current directory so it may be useful to run ``test_pipeline`` in a new directory.
+This will produce a ``summary.html`` file with the test results as well as plots if any are produced.  These files are saved based on the input filename and will be overwritten on subsequent runs, so it is advisable run the test suite in it's own directory.  
+Note that this file and the associated plots will be saved in the current directory so it may be useful to run ``test_pipeline`` in a new directory.
 
 Contributing
 ============
