@@ -15,7 +15,7 @@ Create a JWST pipeline environment to install into and install `pytest-html`
 
 .. code:: bash
 
-  git clone https://github.com/STScI-MESA/calibration-pipeline-testing-tool.git
+  git clone https://github.com/spacetelescope/calibration-pipeline-testing-tool.git
   cd calibration-pipeline-testing-tool
   python setup.py install
 
